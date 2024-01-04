@@ -3,15 +3,21 @@ import yaml
 import argparse
 from datetime import datetime
 
-def map_folder_contents(folder_path):
+def map_folder_contents(folder_path, exclude_folders=[]):
   """
-    Visszaadja a mappában található fájlok listáját
+    Visszaadja a mappában található fájlok listáját, kivéve a kizárandó mappákat 
+    A Pythonban a hosszú elérési utakat a \\?\ prefixszel lehet kezelni. Ezt a prefixszet 
+    hozzá kell adni az elérési út elejéhez. Ez a megoldás csak Windows rendszereken működik!  
     folder_path: mappa elérési útja
+    exclude_folders: kizárandó mappák
   """
-  file_info = []
+  file_info = []  
   for root, dirs, files in os.walk(folder_path):
+    if any(exclude_folder in root for exclude_folder in exclude_folders):
+      continue
     for file in files:
       file_path = os.path.join(root, file)
+      file_path = "\\\\?\\" + file_path
       file_size = os.path.getsize(file_path)
       file_info.append({
         'name': file,
